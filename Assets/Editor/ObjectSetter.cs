@@ -6,6 +6,7 @@ public class ObjectSetter : EditorWindow
 {
     public static ObjectSetter window;
     private static GameObject obj;
+    private static DataHolder data;
 
     [MenuItem ("Toolbox/ObjectSetter")]
     static void OpenWindow()
@@ -27,53 +28,44 @@ public class ObjectSetter : EditorWindow
             // yum tests           
             obj = Selection.activeGameObject;
             GUI.Label(new Rect(5, 5, position.width - 10, 25), "Active object: " + Selection.activeGameObject.name);
-            DataHolder dataComponent = obj.GetComponent<DataHolder>();
-
-            if(dataComponent != null)
+            
+            data = obj.GetComponent<DataHolder>();
+            if(data != null)
             {
-                dataComponent.health = EditorGUI.IntField(
+                data.next = (DataHolder)EditorGUI.ObjectField(
                     new Rect(5, 30, position.width - 10, 16),
-                    "Health",
-                    dataComponent.health
+                    "Next Object",
+                    data.next, typeof(DataHolder), true
                     );
-                dataComponent.username = EditorGUI.TextField(
-                    new Rect(5, 50, position.width - 10, 16),
-                    "Name",
-                    dataComponent.username
-                    );
-                // deprecated from original blogpost
-                dataComponent.cam = (GameObject) EditorGUI.ObjectField(
+
+                data.enableonload = EditorGUI.Toggle(
                     new Rect(5, 70, position.width - 10, 16),
-                    "Main Camera",
-                    dataComponent.cam,
-                    typeof(GameObject),
-                    false
-                    );
+                    "Enable On Load",
+                    data.enableonload = true
+                    );          
             }
             else
             {
-                if(GUI.Button(new Rect(5,30, position.width-10, position.height -40), "Add DataHolder"))
+                if(GUI.Button(new Rect(5,30, position.width-10, 70), "Add DataHolder"))
                 {
                     obj.AddComponent<DataHolder>();
                 }
             }
+        }
 
-           
-
-            //GUI.Label(new Rect(0, 25, position.width, 25), "Position: " + obj.transform.position);
-        }   
-        
-        //if(GUI.Button(new Rect(0,0, 30, 30), "F"))
-        //{
-        //    Debug.Log("DONE");
-        //    AssetDatabase.CreateFolder("Assets", "MyFolder");
-        //}       
+        int i = 0;
+        foreach (DataHolder dataobj in GameObject.FindObjectsOfType(typeof(DataHolder)))
+        {
+            if (GUI.Button(new Rect(5, 110 + i * 20, position.width - 10, 16), dataobj.gameObject.name))
+            {
+                Selection.activeGameObject = dataobj.gameObject;
+            }
+            i++;
+        }
     }
 
     void Update()
     {
         Repaint();
     }
-
-	
 }
